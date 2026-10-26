@@ -1,0 +1,106 @@
+# Compile l'APK IST/B-SCO à chaque envoi sur « main » (et à la demande).
+# Résultat : onglet « Releases » du dépôt (fichier IST-B-SCO-x.y.z.apk) et
+# artefact « IST-B-SCO-apk » de l'exécution.
+name: APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      VERSION_CODE: ${{ github.run_number }}
+      VERSION_NAME: 1.0.${{ github.run_number }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      # Clé de signature de l'Institut (secrets du dépôt, voir LISEZMOI.md).
+      # Sans ces secrets, l'APK est signé avec une clé de débogage (pour essai).
+      - name: Clé de signature
+        env:
+          CLE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          CLE_MDP: ${{ secrets.ANDROID_KEYSTORE_MDP }}
+          CLE_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          CLE_ALIAS_MDP: ${{ secrets.ANDROID_KEY_MDP }}
+        run: |
+          if [ -n "$CLE_B64" ]; then
+            echo "$CLE_B64" | base64 -d > institut.jks
+            {
+              echo "storeFile=institut.jks"
+              echo "storePassword=$CLE_MDP"
+              echo "keyAlias=$CLE_ALIAS"
+              echo "keyPassword=${CLE_ALIAS_MDP:-$CLE_MDP}"
+            } > signature.properties
+            echo "SIGNATURE=institut" >> "$GITHUB_ENV"
+          else
+            echo "::warning::Secrets de signature absents : APK signé avec une clé de débogage (essai seulement)."
+            echo "SIGNATURE=debogage" >> "$GITHUB_ENV"
+          fi
+
+      - name: Tests du cœur et compilation de l'APK
+        run: |
+          set -o pipefail
+          ./gradlew --no-daemon --stacktrace testDebugUnitTest assembleRelease 2>&1 | tee construction.log
+
+      - name: Vérifier l'APK (Android 8 minimum, sans bibliothèque native)
+        run: |
+          APK=app/build/outputs/apk/release/app-release.apk
+          ls -l "$APK"
+          AAPT=$(ls "$ANDROID_HOME"/build-tools/*/aapt | sort -V | tail -1)
+          "$AAPT" dump badging "$APK" | grep -E "package:|sdkVersion|targetSdkVersion|native-code" | tee verification.txt
+          if unzip -l "$APK" | grep -q "lib/"; then echo "::error::bibliothèque native trouvée"; exit 1; fi
+          APKSIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          "$APKSIGNER" verify --print-certs "$APK" | head -5 | tee -a verification.txt
+          mkdir -p sortie
+          cp "$APK" "sortie/IST-B-SCO-${VERSION_NAME}.apk"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: IST-B-SCO-apk
+          path: sortie/*.apk
+
+      - name: Publier dans « Releases »
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-${{ env.VERSION_NAME }}
+          name: IST/B-SCO ${{ env.VERSION_NAME }}
+          body: |
+            Application Android IST/B-SCO (prise de présence), Android 8 à 15, 32 et 64 bits.
+            Signature : ${{ env.SIGNATURE }}.
+            Installer : copier le fichier .apk sur le téléphone puis l'ouvrir (autoriser l'installation d'applications de cette source).
+          files: sortie/*.apk
+          make_latest: true
+
+      # En cas d'échec, le journal est publié sur la branche « journaux-ci » pour être lu facilement.
+      - name: Journal en cas d'échec
+        if: failure()
+        run: |
+          git config user.name "ci-ist-b-sco"
+          git config user.email "ci@ist-b-sco.invalid"
+          mkdir -p /tmp/j && cp construction.log /tmp/j/ 2>/dev/null || echo "pas de journal" > /tmp/j/construction.log
+          find app/build -name "*.xml" -path "*test-results*" -exec cp {} /tmp/j/ \; 2>/dev/null || true
+          git fetch origin journaux-ci 2>/dev/null && git checkout -B journaux-ci origin/journaux-ci || git checkout --orphan journaux-ci
+          git rm -rf --cached . >/dev/null 2>&1 || true
+          rm -rf ./* .github .gitignore 2>/dev/null || true
+          cp /tmp/j/* .
+          git add -A
+          git commit -m "Journal de l'exécution ${{ github.run_number }} (${{ github.sha }})" || true
+          git push -f origin journaux-ci

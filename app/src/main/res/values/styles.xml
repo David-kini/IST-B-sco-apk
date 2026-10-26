@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.IstBSco" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:colorPrimary">@color/noir</item>
+        <item name="android:colorPrimaryDark">@color/noir</item>
+        <item name="android:colorAccent">@color/jaune</item>
+        <item name="android:statusBarColor">@color/noir</item>
+        <item name="android:navigationBarColor">@color/noir</item>
+        <item name="android:windowBackground">@color/fond</item>
+    </style>
+</resources>
