@@ -25,7 +25,7 @@ Application pour les **professeurs, assistants et CP** de l'IST/Boma, reliée à
 | Qui | Où | Rôle |
 |---|---|---|
 | Secrétariat / Institut | PEGSCO (PC) | Crée les cours, les attribue, donne les codes de connexion, consulte les rapports, tranche les écarts et les demandes de blocage |
-| Professeur / assistant / autre intervenant | Application | Fait l'appel de **ses** cours, indique le type de séance (interrogation…), signale des cas |
+| Professeur / assistant / autre intervenant | Application | Fait l'appel de **ses** cours, indique le ou les types de séance (cours, interrogation…), voit l'appel du CP et les écarts, signale des cas |
 | CP (chef de promotion, un étudiant) | Application | **Un CP par filière** (ex. L1 SG, L1 LABO) : fait l'appel des cours de **sa filière** seulement |
 
 - L'appel d'une séance peut être fait **par le CP, par le professeur, ou par les deux**.
@@ -63,24 +63,38 @@ Fiche avec :
 
 ### 3.5 Réception des appels
 Chaque appel reçu est gardé avec :
-- le cours, la date, le **type de séance**, la liste présent ou absent ;
+- le cours, la date, le ou les **types de séance**, la liste présent ou absent ;
 - **qui** l'a fait, **l'heure de l'appel**, **l'heure de validation** (sur le téléphone),
   **l'heure d'envoi** et le téléphone utilisé.
 
-Un appel reçu peut encore être **remplacé depuis le téléphone** tant qu'il est dans
+Un appel reçu peut encore être **corrigé depuis le téléphone** tant qu'il est dans
 son **heure de correction** (1 h après sa validation, voir 4.2). Passé ce délai, il
 est **verrouillé** : le serveur refuse toute nouvelle version, et seul le secrétariat
 peut corriger dans PEGSCO.
 
+### 3.5 bis Traçabilité : rien n'est effacé
+- **Chaque envoi est une version**. Si un appel est envoyé puis renvoyé corrigé,
+  PEGSCO **garde toutes les versions** (v1 reçue à 10 h 12, v2 reçue à 10 h 40…).
+  La dernière fait foi, mais les anciennes restent consultables.
+- Pour chaque version : qui, depuis quel téléphone, l'heure de validation, l'heure
+  d'envoi, et **la liste de ce qui a changé** (ex. « MBUMBA NZAU : Absent → Présent »).
+- Les corrections du secrétariat sont aussi des versions, avec la raison et le nom de
+  la personne.
+- Un même envoi reçu deux fois, ou un même fichier de sauvegarde importé deux fois,
+  n'est pas compté deux fois : chaque appel porte un identifiant unique.
+- **Écran « Historique d'un appel »** dans PEGSCO : toutes les versions, avec les
+  changements surlignés.
+
 ### 3.6 Écrans et rapports
-- **Séances d'un cours** : date, type (cours, interrogation, TP, examen…), qui a fait
+- **Séances d'un cours** : date, type(s) (cours, interrogation, TP, examen…), qui a fait
   l'appel, nombre de présents et d'absents.
 - **Assiduité d'un étudiant par cours** :
   - nombre de présences sur nombre de séances (ex. 9 / 12) ;
   - présence à chaque interrogation, TP et examen ;
   - signalements.
-- **Écarts CP / professeur** : même séance, étudiant présent pour l'un et absent pour
-  l'autre. Le secrétariat tranche, et la décision est gardée.
+- **Écarts CP / professeur** : même cours, même jour, étudiant présent pour l'un et
+  absent pour l'autre. On y voit aussi les **corrections successives** de chacun
+  (versions). Le secrétariat tranche, et la décision est gardée.
 - **Demandes de blocage** : celles des professeurs. L'Institut **valide ou refuse**,
   avec la raison.
 - **Rapport par intervenant** : séances données, interrogations et TP faits.
@@ -97,8 +111,11 @@ peut corriger dans PEGSCO.
 
 ### 4.2 Faire l'appel (hors ligne)
 1. Choisir le **cours**. La date est celle du jour.
-2. Choisir le **type de séance** : **Cours**, **Interrogation**, **TP**, **Examen** ou
-   **Autre**. C'est ici qu'on **signale une interrogation**.
+2. Cocher le ou les **types de séance** : **Cours**, **Interrogation**, **TP**,
+   **Examen**, **Autre**. **Plusieurs types sont possibles** (ex. Cours + Interrogation).
+   C'est ici qu'on **signale une interrogation**.
+   Pas d'horaire fixe : l'appel se fait au moment du cours, et la date et l'heure de
+   l'appel sont notées automatiquement.
 3. Les noms défilent dans l'ordre de la liste, avec deux gros boutons **Présent / Absent**.
 4. Un récapitulatif s'affiche (ex. « 52 présents, 7 absents »), puis on enregistre.
    L'heure de l'appel est notée automatiquement.
@@ -127,8 +144,34 @@ peut corriger dans PEGSCO.
 - On peut envoyer **le jour même ou un autre jour**.
 - On ne peut envoyer que des appels **validés**.
 - Après l'envoi, l'appel passe en « Envoyé ».
-- S'il est corrigé pendant son heure de correction, il repasse en « À renvoyer » ; à
-  l'envoi suivant, la nouvelle version remplace l'ancienne dans PEGSCO.
+- S'il est corrigé pendant son heure de correction, il repasse en « À renvoyer ». À
+  l'envoi suivant, PEGSCO ajoute la nouvelle version **sans effacer l'ancienne** (voir
+  3.5 bis).
+
+### 4.4 bis Fichier de sauvegarde
+- Bouton **« Sauvegarde d'une date »** : crée un fichier qui contient tous les appels
+  **validés** de cette date, avec leurs versions et leurs signalements.
+- Usage :
+  - copie de secours dans le téléphone ;
+  - à remettre au secrétariat (câble, clé USB, partage) si le Wi-Fi ou le serveur reste
+    indisponible.
+- PEGSCO : menu **« Importer une sauvegarde »**. Le fichier est **signé** : un fichier
+  modifié à la main est refusé. Ce qui a déjà été reçu n'est pas compté deux fois, et
+  l'import est tracé (qui, quand, quel fichier).
+
+### 4.4 ter Professeur : voir l'appel du CP et les écarts
+- Après **Actualiser**, le professeur reçoit, pour **ses** cours, les appels **envoyés
+  par les CP** (dernière version, et l'historique des corrections).
+- Écran **« Comparer »** pour un cours et une date :
+  - son appel et celui du CP côte à côte ;
+  - les **étudiants en désaccord** mis en avant (ex. « présent selon le CP, absent
+    selon vous ») ;
+  - les **corrections du CP** après sa validation (ex. « le CP a passé MBUMBA NZAU de
+    Absent à Présent à 10 h 40 »).
+- Le professeur peut **signaler l'écart** au secrétariat (« vérifier : présence
+  contestée »), avec un commentaire.
+- Le CP, lui, **ne voit pas** l'appel du professeur : il ne peut pas recopier sa liste
+  pour faire disparaître un écart.
 
 ### 4.5 Sécurité
 - Code de connexion personnel et révocable, plus un PIN local.
@@ -143,7 +186,7 @@ peut corriger dans PEGSCO.
 - Le serveur refuse :
   - un appel pour un cours non attribué à la personne ;
   - une date future ;
-  - un doublon (même téléphone, même cours, même date et même type de séance).
+  - une version d'un appel déjà verrouillé.
 
 ## 5. Décisions prises par défaut (modifiables)
 - **Statuts** : **Présent / Absent** seulement.
@@ -176,13 +219,15 @@ peut corriger dans PEGSCO.
    - rapports, écarts, blocages.
 2. **Application** :
    - connexion, téléchargement des listes ;
-   - appel hors ligne, type de séance, signalements ;
+   - appel hors ligne, types de séance, signalements ;
+   - validation et heure de correction, envoi, fichier de sauvegarde ;
+   - comparaison CP / professeur, historique des versions ;
    - Actualiser et Envoyer.
 3. **Essai réel** sur 1 ou 2 téléphones, avec une promotion.
 4. **Installation** sur tous les téléphones.
 
-## 8. Questions encore ouvertes
-- Un **horaire fixe** par cours (jour et heure) est-il nécessaire, ou l'appel se fait-il
-  au moment du cours, sans horaire enregistré ?
-- Faut-il aussi un **fichier de sauvegarde** (copie de secours d'une date, à remettre
-  au secrétariat), ou l'envoi par Wi-Fi suffit-il ?
+## 8. Décisions prises par défaut (à confirmer)
+- **Le CP ne voit pas l'appel du professeur.** Seul le professeur et le secrétariat
+  voient les écarts.
+- Plusieurs appels du même cours **le même jour** sont possibles (deux séances). Chacun
+  est une séance distincte, repérée par son heure d'appel.
