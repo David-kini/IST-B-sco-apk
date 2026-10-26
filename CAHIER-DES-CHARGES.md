@@ -26,7 +26,7 @@ Application pour les **professeurs, assistants et CP** de l'IST/Boma, reliée à
 |---|---|---|
 | Secrétariat / Institut | PEGSCO (PC) | Crée les cours, les attribue, donne les codes de connexion, consulte les rapports, tranche les écarts et les demandes de blocage |
 | Professeur / assistant / autre intervenant | Application | Fait l'appel de **ses** cours, indique le type de séance (interrogation…), signale des cas |
-| CP (chef de promotion, un étudiant) | Application | Fait l'appel des cours de **sa** promotion |
+| CP (chef de promotion, un étudiant) | Application | **Un CP par filière** (ex. L1 SG, L1 LABO) : fait l'appel des cours de **sa filière** seulement |
 
 - L'appel d'une séance peut être fait **par le CP, par le professeur, ou par les deux**.
   Rien ne l'interdit. Quand les deux appellent, PEGSCO **compare** et **signale les
@@ -45,8 +45,14 @@ Fiche avec :
 - **Attribution** à un ou plusieurs intervenants (titulaire, assistant…).
 
 ### 3.3 CP
+- **Un CP par filière** : L1 SG a son CP, L1 LABO a le sien, et ainsi de suite.
 - Dans la fiche d'un étudiant : case **« Chef de promotion (CP) »**, pour l'année.
-- Le CP peut faire l'appel de tous les cours de sa classe et de sa filière.
+  Elle vaut pour sa filière, dans sa classe.
+- Le CP ne fait l'appel que des cours de **sa filière**, et seulement pour les
+  étudiants de **sa filière**.
+- Pour un cours commun à plusieurs filières (tronc commun), chaque CP appelle
+  uniquement les étudiants de sa filière. Le professeur, lui, peut appeler toutes les
+  filières de son cours.
 
 ### 3.4 Code de connexion à l'application
 - Dès qu'une personne a un cours attribué (intervenant) ou qu'elle est désignée CP
@@ -82,7 +88,8 @@ Un appel reçu **n'est plus modifiable depuis le téléphone**.
 ### 4.1 Première utilisation
 1. Sur le Wi-Fi de l'IST, saisir l'**adresse du PC serveur** (ou scanner le QR code) et
    le **code de connexion**.
-2. L'application télécharge les **cours** de la personne et la **liste des étudiants**.
+2. L'application télécharge les **cours** de la personne et la **liste des étudiants**
+   (pour un CP : seulement ceux de sa filière).
 3. L'utilisateur choisit un **code PIN** pour ouvrir l'application.
 
 ### 4.2 Faire l'appel (hors ligne)
