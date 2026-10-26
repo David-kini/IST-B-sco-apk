@@ -64,10 +64,13 @@ Fiche avec :
 ### 3.5 Réception des appels
 Chaque appel reçu est gardé avec :
 - le cours, la date, le **type de séance**, la liste présent ou absent ;
-- **qui** l'a fait, **l'heure de l'appel** (sur le téléphone), **l'heure d'envoi** et le
-  téléphone utilisé.
+- **qui** l'a fait, **l'heure de l'appel**, **l'heure de validation** (sur le téléphone),
+  **l'heure d'envoi** et le téléphone utilisé.
 
-Un appel reçu **n'est plus modifiable depuis le téléphone**.
+Un appel reçu peut encore être **remplacé depuis le téléphone** tant qu'il est dans
+son **heure de correction** (1 h après sa validation, voir 4.2). Passé ce délai, il
+est **verrouillé** : le serveur refuse toute nouvelle version, et seul le secrétariat
+peut corriger dans PEGSCO.
 
 ### 3.6 Écrans et rapports
 - **Séances d'un cours** : date, type (cours, interrogation, TP, examen…), qui a fait
@@ -99,7 +102,14 @@ Un appel reçu **n'est plus modifiable depuis le téléphone**.
 3. Les noms défilent dans l'ordre de la liste, avec deux gros boutons **Présent / Absent**.
 4. Un récapitulatif s'affiche (ex. « 52 présents, 7 absents »), puis on enregistre.
    L'heure de l'appel est notée automatiquement.
-5. Tant que l'appel n'est pas envoyé, il peut être corrigé sur le téléphone.
+5. **Tant que l'appel n'est pas validé**, il reste un brouillon : on peut le corriger
+   autant qu'on veut.
+6. **Valider l'appel du jour** : bouton « Valider ». L'heure de validation est notée.
+7. **Heure de correction** : pendant **1 heure** après la validation, l'appel peut
+   encore être corrigé, par exemple pour un retardataire ou une erreur de bouton.
+   Un compte à rebours s'affiche (« modifiable encore 42 min »).
+8. **Après 1 heure**, l'appel est **verrouillé** sur le téléphone. Il n'est plus
+   modifiable, qu'il soit envoyé ou non.
 
 ### 4.3 Signaler un cas (professeur)
 - Sur un étudiant : parti avant la fin, fraude ou triche, copie non rendue,
@@ -115,12 +125,21 @@ Un appel reçu **n'est plus modifiable depuis le téléphone**.
   - sinon, il affiche « Serveur indisponible : réessayez plus tard ». Les appels restent
     dans le téléphone.
 - On peut envoyer **le jour même ou un autre jour**.
-- Après l'envoi, l'appel passe en « Envoyé » et n'est plus modifiable.
+- On ne peut envoyer que des appels **validés**.
+- Après l'envoi, l'appel passe en « Envoyé ».
+- S'il est corrigé pendant son heure de correction, il repasse en « À renvoyer » ; à
+  l'envoi suivant, la nouvelle version remplace l'ancienne dans PEGSCO.
 
 ### 4.5 Sécurité
 - Code de connexion personnel et révocable, plus un PIN local.
-- Un appel envoyé ne se modifie plus. Toute correction est faite dans PEGSCO par le
-  secrétariat, avec la raison notée.
+- Un appel validé depuis plus d'**1 heure** ne se modifie plus, ni sur le téléphone ni
+  par un renvoi. Toute correction est alors faite dans PEGSCO par le secrétariat, avec
+  la raison notée.
+- Le **serveur contrôle aussi** ce délai : il refuse une nouvelle version reçue pour un
+  appel dont l'heure de correction est passée.
+- **Contrôle de l'heure** : il compare l'heure du téléphone et la sienne à chaque envoi.
+  Si le téléphone a été mis à une fausse date ou heure, l'appel est marqué « heure
+  douteuse » dans PEGSCO, pour vérification.
 - Le serveur refuse :
   - un appel pour un cours non attribué à la personne ;
   - une date future ;
@@ -130,7 +149,8 @@ Un appel reçu **n'est plus modifiable depuis le téléphone**.
 - **Statuts** : **Présent / Absent** seulement.
 - **Notes** : l'application ne note **pas** les notes obtenues, seulement la
   **présence** aux interrogations, TP et examens.
-- **Correction après envoi** : uniquement par le secrétariat dans PEGSCO, avec la raison.
+- **Correction** : libre avant la validation, puis **1 heure** après la validation.
+  Au-delà, uniquement par le secrétariat dans PEGSCO, avec la raison.
 - **Seuil de présence pour l'examen** : aucun au départ. L'Institut pourra en fixer un
   (ex. 75 %) par cours ou pour tous ; PEGSCO listera alors les étudiants en dessous.
 
