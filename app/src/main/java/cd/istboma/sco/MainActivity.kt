@@ -599,8 +599,8 @@ class MainActivity : Activity() {
         ajouter(texte("Pour signaler un étudiant pendant un appel validé, appuyez longuement sur son nom. Vous pouvez aussi signaler ici.", 13f, couleur = GRIS), 10)
         if (d != null && d.cours.isNotEmpty()) {
             val k = carte()
-            val sCours = Spinner(this).apply { adapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_spinner_dropdown_item, d.cours.map { it.titre }) }
-            val sEtu = Spinner(this)
+            val sCours = Spinner(this@MainActivity).apply { adapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_spinner_dropdown_item, d.cours.map { it.titre }) }
+            val sEtu = Spinner(this@MainActivity)
             fun majEtudiants() {
                 val c = d.cours[sCours.selectedItemPosition.coerceAtLeast(0)]
                 sEtu.adapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_spinner_dropdown_item, c.etudiants.map { it.nomComplet })
